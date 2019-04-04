@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.function.Consumer;
 
 /*hello this is ari!!!*/
+//hi
 
 public class Client extends NetworkConnection {
 
