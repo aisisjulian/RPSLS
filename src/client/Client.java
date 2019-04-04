@@ -3,6 +3,8 @@ package client;
 import java.io.Serializable;
 import java.util.function.Consumer;
 
+/*hello this is ari!!!*/
+
 public class Client extends NetworkConnection {
 
     private String ip;
