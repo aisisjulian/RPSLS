@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 
 /*hello this is ari!!!*/
 //hi
-
+//hello
 public class Client extends NetworkConnection {
 
     private String ip;
