@@ -22,5 +22,6 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="javafx11" level="project" />
+    <orderEntry type="library" name="javafx-sdk-11.0" level="application" />
   </component>
 </module>
