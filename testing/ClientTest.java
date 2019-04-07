@@ -12,7 +12,7 @@ class ClientTest {
     @BeforeEach
     public void clientConstructorTest() {
         final String data = " ";
-        c = new Client("192.168.0.111", 8080, d->{});
+        c = new Client("192.168.0.111", 8080, "TestName", d->{});
         assertNotNull(c, "client constructor failed");
     }
 

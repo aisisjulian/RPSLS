@@ -15,7 +15,7 @@ class NetworkConnectionTest {
     @BeforeEach
     public void clientConstructorTest() {
         final String data = " ";
-        NC = new Client("192.168.0.111", 8080, d->{});
+        NC = new Client("192.168.0.111", 8080, "TestName", d->{});
         assertNotNull(NC, "client constructor failed");
     }
 

@@ -21,18 +21,20 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
-
 import java.io.IOException;
+import java.util.ArrayList;
+
 
 //warisa's comment
 public class clientFX extends Application {
 
     private Scene startScene;
-    private Scene gameScene;
+    private Scene gameScene, waitingScene;
     private NetworkConnection conn;
     private TextArea ipInput = new TextArea();
     private TextArea portInput = new TextArea();
-    private Label ip, port, messages, startMessages;
+    private TextArea nameInput = new TextArea();
+    private Label ip, port, messages, name,  startMessages;
     private Button connect = new Button("connect");
 
     private Image backgroundImage = new Image("background.jpg");
@@ -95,11 +97,12 @@ public class clientFX extends Application {
     private HBox oppHealthBar;
     private Label userScoreLabel = new Label("USER:");
     private Label oppScoreLabel = new Label("OPPONENT:");
-    private BorderPane gamePane, startPane;
+    private BorderPane gamePane, startPane, waitingPane;
     private HBox playBox;
 
     private boolean madeChoice = false;
     private boolean isConnected = false;
+    private ArrayList clientsConnected = new ArrayList<>();
 
     public ImageView getChoicePlayed(String s){
         ImageView c;
@@ -382,6 +385,7 @@ public class clientFX extends Application {
 
         ipInput.setPrefSize(150, 20);
         portInput.setPrefSize(150, 20);
+        nameInput.setPrefSize(150, 20);
         ip = new Label ("      IP:");
         ip.setTextAlignment(TextAlignment.RIGHT);
         ip.setTextFill(Color.WHITE);
@@ -389,19 +393,32 @@ public class clientFX extends Application {
         port = new Label("Port #:");
         port.setTextFill(Color.WHITE);
         port.setPrefSize(50, 16);
+        name = new Label("Name: ");
+        name.setTextFill(Color.WHITE);
+        name.setPrefSize(50, 16);
         HBox ipBox = new HBox(ip, ipInput);
         ipBox.setAlignment(Pos.CENTER);
         HBox portBox = new HBox(port, portInput);
         portBox.setAlignment(Pos.CENTER);
+        HBox nameBox = new HBox(name, nameInput);
+        nameBox.setAlignment(Pos.CENTER);
         connect.setPrefSize(100, 40);
         connect.setAlignment(Pos.CENTER);
         connect.setTextFill(Color.WHITE);
         connect.setBackground(buttonBackground);
-        VBox paneCenter = new VBox(30, ipBox, portBox, connect);
+        VBox paneCenter = new VBox(30, ipBox, portBox, nameBox, connect);
         paneCenter.setAlignment(Pos.TOP_CENTER);
         startPane.setCenter(paneCenter);
 
         return startPane;
+    }
+
+    private Parent createWaitingContent(){
+        //need list of all currently connected players
+        waitingPane = new BorderPane();
+        waitingPane.setBackground(background);
+
+        return waitingPane;
     }
     public void disableOptions(){
         rockButton.setDisable(true);
@@ -422,6 +439,7 @@ public class clientFX extends Application {
     public void start(Stage primaryStage){
         // TODO Auto-generated method stub
         startScene = new Scene(createStartContent(), 400, 400);
+        waitingScene = new Scene(createWaitingContent(), 400, 400);
         gameScene = new Scene(createGameContent(), 700, 500);
         primaryStage.setScene(startScene);
 
@@ -527,7 +545,7 @@ public class clientFX extends Application {
         connect.setOnAction(event->{
             if(!ipInput.getText().isEmpty() && !portInput.getText().isEmpty()){
                 try {
-                    conn = createClient(ipInput.getText(), Integer.parseInt(portInput.getText()), primaryStage);
+                    conn = createClient(ipInput.getText(), Integer.parseInt(portInput.getText()), nameInput.getText(), primaryStage);
                     Runnable task = () -> conn.clientConnect();
                     Thread t = new Thread(task);
                     t.setDaemon(true);
@@ -538,6 +556,9 @@ public class clientFX extends Application {
                     port.setVisible(false);
                     portInput.clear();
                     portInput.setVisible(false);
+                    name.setVisible(false);
+                    nameInput.clear();
+                    nameInput.setVisible(false);
                     connect.setDisable(true);
                     connect.setText("waiting for opponent");
                     connect.setPrefSize(300, 40);
@@ -546,6 +567,7 @@ public class clientFX extends Application {
                     connect.setDisable(false);
                     ipInput.clear();
                     portInput.clear();
+                    nameInput.clear();
                 }
             }
 
@@ -563,14 +585,24 @@ public class clientFX extends Application {
         }
     }
 
-    private Client createClient(String IP, int portIn, Stage primaryStage) {
-        return new Client(IP, portIn, data -> {
+    private Client createClient(String IP, int portIn, String username, Stage primaryStage) {
+        return new Client(IP, portIn, username, data -> {
            Platform.runLater(()->{
+               data.toString();
+               if (data.toString().split(",")[0].equals("[NAMESLIST")){ //received list of connected clients
+                   String[] clients = data.toString().split(","); //populate clientsConnected list
+                   for (int i = 0; i < clients.length; i++){
+                       clientsConnected.add(clients[i]);
+                   }
+               }
+
                switch (data.toString()) {
                    case "CONNECTED":
                        startMessages.setText("CONNECTED TO SERVER");
                        startMessages.setPrefSize(300, 40);
                        isConnected = true;
+                       try{ conn.send("NAME: " + username); }
+                       catch(Exception e){ System.out.println("Error in clientFX"); }
                        break;
                    case "NO CONNECTION":
                        isConnected = false;
@@ -580,6 +612,9 @@ public class clientFX extends Application {
                        port.setVisible(true);
                        portInput.clear();
                        portInput.setVisible(true);
+                       name.setVisible(true);
+                       nameInput.clear();
+                       nameInput.setVisible(true);
                        connect.setDisable(false);
                        connect.setText("connect");
                        connect.setPrefSize(100, 40);

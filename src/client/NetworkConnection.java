@@ -53,6 +53,7 @@ public abstract class NetworkConnection {
              while (isConnected) {
                  Serializable data = (Serializable) in.readObject();
                  callback.accept(data);
+
                  System.out.println("Client Recieved: " + data);
              }
             } catch (Exception e) {
