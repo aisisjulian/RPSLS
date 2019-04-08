@@ -445,6 +445,10 @@ public class clientFX extends Application {
                if (data.toString().split(",")[0].equals("[NAMESLIST")){ //received list of connected clients
                    String[] clients = data.toString().split(","); //populate clientsConnected list
                    for (int i = 0; i < clients.length; i++){ clientsConnected.add(clients[i]);  }
+                   waitingScene = new Scene(createWaitingContent(), 400, 400);
+                   if(primaryStage.getScene() != gameScene) {
+                       primaryStage.setScene(waitingScene);
+                   }
                }
 
                switch (data.toString()) {
@@ -455,8 +459,6 @@ public class clientFX extends Application {
                        try{ conn.send("NAME: " + username); }
                        catch(Exception e){ System.out.println("Error in clientFX"); }
                        System.out.println("creating waiting scene");
-                       waitingScene = new Scene(createWaitingContent(), 400, 400);
-                       primaryStage.setScene(waitingScene);
                        break;
                    case "NO CONNECTION":
                        isConnected = false;
