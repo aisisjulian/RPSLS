@@ -476,8 +476,6 @@ public class clientFX extends Application {
                        startMessages.setPrefSize(300, 40);
                        primaryStage.setScene(startScene);
                        break;
-                   case "closing":
-                       break;
                    case "start":
                        messages.setText(".....");
                        enableOptions();
