@@ -71,9 +71,9 @@ public class clientFX extends Application {
     private Button lizardButton = new Button();
     private Button spockButton = new Button();
 
-    private Button playAgain = new Button("Play Again");
+    private Button playAgain = new Button("Play Again"); //change to continue from again
     private Button quit = new Button("Quit");
-    private Button next = new Button("Next");
+    private Button next = new Button("Continue");
 
     private Button play = new Button("Play");
     private Label userChoiceDisplay = new Label();
@@ -517,6 +517,7 @@ public class clientFX extends Application {
             userChoice = "blank";
             userChoiceDisplay.setGraphic(getChoicePlayed(userChoice));
             messages.setText("......");
+            primaryStage.setScene(waitingScene);
             next.setDisable(true);
         });
         quit.setOnAction(event->{
