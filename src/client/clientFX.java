@@ -23,6 +23,11 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.ArrayList;
+import javafx.collections.ObservableList;
+import javafx.collections.FXCollections;
+import javafx.scene.control.ComboBox;
+import javax.swing.JComboBox;
+import javafx.scene.Group;
 
 
 //warisa's comment
@@ -102,7 +107,8 @@ public class clientFX extends Application {
 
     private boolean madeChoice = false;
     private boolean isConnected = false;
-    private ArrayList clientsConnected = new ArrayList<>();
+    private ArrayList<String> clientsConnected = new ArrayList<String>();
+    private  JComboBox<String> comboBox1;
 
     public ImageView getChoicePlayed(String s){
         ImageView c;
@@ -418,6 +424,18 @@ public class clientFX extends Application {
         waitingPane = new BorderPane();
         waitingPane.setBackground(background);
 
+        ObservableList<String> obsList = FXCollections.observableArrayList(clientsConnected);
+
+        ComboBox<String> combo = new ComboBox<>(obsList);
+
+        System.out.println("In createWaitingContent:");
+        for (int i =0; i < obsList.size(); i++){
+            System.out.println(obsList.get(i));
+        }
+        VBox vbox = new VBox();
+        vbox.getChildren().setAll(combo);
+        waitingPane.setCenter(vbox);
+
         return waitingPane;
     }
     public void disableOptions(){
@@ -591,9 +609,7 @@ public class clientFX extends Application {
                data.toString();
                if (data.toString().split(",")[0].equals("[NAMESLIST")){ //received list of connected clients
                    String[] clients = data.toString().split(","); //populate clientsConnected list
-                   for (int i = 0; i < clients.length; i++){
-                       clientsConnected.add(clients[i]);
-                   }
+                   for (int i = 0; i < clients.length; i++){ clientsConnected.add(clients[i]); }
                }
 
                switch (data.toString()) {
@@ -603,6 +619,7 @@ public class clientFX extends Application {
                        isConnected = true;
                        try{ conn.send("NAME: " + username); }
                        catch(Exception e){ System.out.println("Error in clientFX"); }
+                       primaryStage.setScene(waitingScene);
                        break;
                    case "NO CONNECTION":
                        isConnected = false;
