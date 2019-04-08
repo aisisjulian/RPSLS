@@ -2,6 +2,8 @@ package client;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -108,7 +110,8 @@ public class clientFX extends Application {
     private boolean madeChoice = false;
     private boolean isConnected = false;
     private ArrayList<String> clientsConnected = new ArrayList<String>();
-    private  JComboBox<String> comboBox1;
+    private ComboBox<String> combo;
+    private Button waitingBtn = new Button("Choose Player");
 
     public ImageView getChoicePlayed(String s){
         ImageView c;
@@ -420,21 +423,26 @@ public class clientFX extends Application {
     }
 
     private Parent createWaitingContent(){
-        //need list of all currently connected players
         waitingPane = new BorderPane();
         waitingPane.setBackground(background);
 
-        ObservableList<String> obsList = FXCollections.observableArrayList(clientsConnected);
+        clientsConnected.remove(0); //remove nameslist from array
+        String lastname[] = clientsConnected.get(clientsConnected.size()-1).split("]"); //to remove ] off of last name in array
+        clientsConnected.remove(clientsConnected.size()-1);
+        clientsConnected.add(lastname[0]);
+        combo = new ComboBox<>(FXCollections.observableList(clientsConnected));
 
-        ComboBox<String> combo = new ComboBox<>(obsList);
 
-        System.out.println("In createWaitingContent:");
-        for (int i =0; i < obsList.size(); i++){
-            System.out.println(obsList.get(i));
-        }
-        VBox vbox = new VBox();
-        vbox.getChildren().setAll(combo);
-        waitingPane.setCenter(vbox);
+        waitingBtn.setOnAction(chooseOpponent);
+
+        HBox hbox = new HBox();
+        hbox.getChildren().setAll(combo, waitingBtn);
+        hbox.setAlignment(Pos.CENTER);
+        waitingPane.setCenter(hbox);
+
+
+
+        //OPPONENT:
 
         return waitingPane;
     }
@@ -457,7 +465,6 @@ public class clientFX extends Application {
     public void start(Stage primaryStage){
         // TODO Auto-generated method stub
         startScene = new Scene(createStartContent(), 400, 400);
-        waitingScene = new Scene(createWaitingContent(), 400, 400);
         gameScene = new Scene(createGameContent(), 700, 500);
         primaryStage.setScene(startScene);
 
@@ -609,7 +616,9 @@ public class clientFX extends Application {
                data.toString();
                if (data.toString().split(",")[0].equals("[NAMESLIST")){ //received list of connected clients
                    String[] clients = data.toString().split(","); //populate clientsConnected list
-                   for (int i = 0; i < clients.length; i++){ clientsConnected.add(clients[i]); }
+                   for (int i = 0; i < clients.length; i++){ clientsConnected.add(clients[i]);  }
+                   waitingScene = new Scene(createWaitingContent(), 400, 400);
+                   primaryStage.setScene(waitingScene);
                }
 
                switch (data.toString()) {
@@ -619,7 +628,7 @@ public class clientFX extends Application {
                        isConnected = true;
                        try{ conn.send("NAME: " + username); }
                        catch(Exception e){ System.out.println("Error in clientFX"); }
-                       primaryStage.setScene(waitingScene);
+                       System.out.println("creating waiting scene");
                        break;
                    case "NO CONNECTION":
                        isConnected = false;
@@ -743,4 +752,13 @@ public class clientFX extends Application {
            });
         });
     }
+
+    EventHandler<ActionEvent> chooseOpponent = new EventHandler<ActionEvent>(){
+
+        public void handle(ActionEvent event) {
+            String choice = combo.getValue();
+            System.out.println("Player chose opponent: " + choice);
+
+        }
+    };
 }
