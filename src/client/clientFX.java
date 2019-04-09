@@ -87,6 +87,7 @@ public class clientFX extends Application {
     private Button waitingBtn = new Button("Choose Player");
     private String choice;
     private String username;
+    private Button waitingBackBtn = new Button("Back to Start");
 
 
     public ImageView getChoicePlayed(String s){
@@ -265,7 +266,7 @@ public class clientFX extends Application {
         waitingBtn.setOnAction(chooseOpponent);
 
         HBox hbox = new HBox();
-        hbox.getChildren().setAll(combo, waitingBtn);
+        hbox.getChildren().setAll(combo, waitingBtn, waitingBackBtn);
         hbox.setAlignment(Pos.CENTER);
         waitingPane.setCenter(hbox);
 
@@ -294,6 +295,10 @@ public class clientFX extends Application {
         startScene = new Scene(createStartContent(), 400, 400);
         gameScene = new Scene(createGameContent(), 700, 500);
         primaryStage.setScene(startScene);
+
+        waitingBackBtn.setOnAction(actionEvent -> {
+            primaryStage.setScene(startScene);
+        });
 
         rockButton.setOnAction(event->{
             enableOptions();
