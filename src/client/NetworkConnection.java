@@ -14,7 +14,6 @@ public abstract class NetworkConnection {
     private ObjectOutputStream out;
     private ObjectInputStream in;
 
-
     public NetworkConnection(Consumer<Serializable> callback) {
         this.callback = callback;
         isConnected = true;
@@ -30,7 +29,6 @@ public abstract class NetworkConnection {
     public void closeConn() throws Exception{
         isConnected = false;
         this.socketClient.close();
-
     }
 
     abstract protected String getIP();
@@ -58,9 +56,5 @@ public abstract class NetworkConnection {
             } catch (Exception e) {
                 callback.accept("NO CONNECTION");
             }
-
     }
-
 }
-
-
