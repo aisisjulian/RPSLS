@@ -562,6 +562,10 @@ public class clientFX extends Application {
                        oppChoiceDisplay.setGraphic(getChoicePlayed(oppChoice));
                        userChoiceDisplay.setGraphic(getChoicePlayed(userChoice));
                        break;
+                   case "tie":
+                       messages.setText("Tie!");
+                       gamePane.setTop(messages);
+                       break;
                    case "playerDisconnected":
                        primaryStage.setScene(startScene);
                        messages.setText("PLAYER DISCONNECTED :-(");
