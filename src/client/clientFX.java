@@ -85,6 +85,9 @@ public class clientFX extends Application {
     private ArrayList<String> clientsConnected = new ArrayList<String>();
     private ComboBox<String> combo;
     private Button waitingBtn = new Button("Choose Player");
+    private String choice;
+    private String username;
+
 
     public ImageView getChoicePlayed(String s){
         ImageView c;
@@ -388,6 +391,8 @@ public class clientFX extends Application {
             if(!ipInput.getText().isEmpty() && !portInput.getText().isEmpty()){
                 try {
                     conn = createClient(ipInput.getText(), Integer.parseInt(portInput.getText()), nameInput.getText(), primaryStage);
+                    username = nameInput.getText();
+                    primaryStage.setTitle(username);
                     Runnable task = () -> conn.clientConnect();
                     Thread t = new Thread(task);
                     t.setDaemon(true);
@@ -565,8 +570,11 @@ public class clientFX extends Application {
     EventHandler<ActionEvent> chooseOpponent = new EventHandler<ActionEvent>(){
 
         public void handle(ActionEvent event) {
-            String choice = combo.getValue();
+            choice = combo.getValue();
             System.out.println("Player chose opponent: " + choice);
+            try {
+                conn.send("CHOICE: " + username + " chose " + choice);
+            }catch (Exception e){ System.out.println("Caught in chooseOpponent function");  }
 
         }
     };
