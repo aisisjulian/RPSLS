@@ -49,7 +49,18 @@ public abstract class NetworkConnection {
              send("CONNECTED");
              while (isConnected) {
                  Serializable data = (Serializable) in.readObject();
+
+                 if(data.toString().split(" ")[0].equals("PLAY-REQUEST:")){
+                     send(data);
+                 }
+                 if(data.toString().split(" ")[0].equals("WAIT")){
+                     send(data);
+                 }
+                 if(data.toString().split(" ")[0].equals("ACCEPTED")){
+                     send(data);
+                 }
                  callback.accept(data);
+
 
                  System.out.println("Client Recieved: " + data);
              }

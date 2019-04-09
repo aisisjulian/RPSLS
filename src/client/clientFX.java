@@ -578,7 +578,7 @@ public class clientFX extends Application {
             choice = combo.getValue();
             System.out.println("Player chose opponent: " + choice);
             try {
-                conn.send("CHOICE: " + username + " chose " + choice);
+                conn.send("OPPONENT: " + username);
             }catch (Exception e){ System.out.println("Caught in chooseOpponent function");  }
 
         }
