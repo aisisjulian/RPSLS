@@ -2,6 +2,8 @@ package client;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -48,9 +50,6 @@ public class clientFX extends Application {
     private Image buttonBackgroundImage = new Image("buttonBackground.jpg");
     private Background buttonBackground = new Background(new BackgroundFill(new ImagePattern(buttonBackgroundImage), CornerRadii.EMPTY, Insets.EMPTY));
 
-    private Image healthBarImage = new Image("healthBar.jpg");
-    private Background healthBarBackground = new Background(new BackgroundFill(Color.HONEYDEW, CornerRadii.EMPTY, Insets.EMPTY));
-
     private Image rockImage = new Image("rock.png");
     private Image paperImage = new Image("paper.png");
     private Image scissorsImage = new Image("scissors.png");
@@ -81,34 +80,14 @@ public class clientFX extends Application {
     private String userChoice = "blank";
     private String oppChoice = "blank";
 
-    private Image lifeImage = new Image("life.png");
-    private Image deadImage = new Image("dead.png");
-
-    private ImageView lifeIV = new ImageView(lifeImage);
-    private ImageView deadIV = new ImageView(deadImage);
-
-    private int userScore = 0;
-    private int oppScore = 0;
-
-    private Label uhealth1 = new Label();
-    private Label uhealth2 = new Label();
-    private Label uhealth3 = new Label();
-
-    private Label ohealth1 = new Label();
-    private Label ohealth2 = new Label();
-    private Label ohealth3 = new Label();
-
-    private HBox userHealthBar;
-    private HBox oppHealthBar;
-    private Label userScoreLabel = new Label("USER:");
-    private Label oppScoreLabel = new Label("OPPONENT:");
     private BorderPane gamePane, startPane, waitingPane;
     private HBox playBox;
 
     private boolean madeChoice = false;
     private boolean isConnected = false;
     private ArrayList<String> clientsConnected = new ArrayList<String>();
-    private  JComboBox<String> comboBox1;
+    private ComboBox<String> combo;
+    private Button waitingBtn = new Button("Choose Player");
 
     public ImageView getChoicePlayed(String s){
         ImageView c;
@@ -131,139 +110,6 @@ public class clientFX extends Application {
         // TODO Auto-generated method stub
         launch(args);
     }
-
-    private HBox getUserHealthBar(){
-        HBox healthBar;
-        ImageView life1 = new ImageView(lifeImage);
-        ImageView life2 = new ImageView(lifeImage);
-        ImageView life3 = new ImageView(lifeImage);
-
-        ImageView dead1 = new ImageView(deadImage);
-        ImageView dead2 = new ImageView(deadImage);
-        ImageView dead3 = new ImageView(deadImage);
-
-        life1.setFitHeight(30);
-        life1.setFitWidth(30);
-        life1.setPreserveRatio(true);
-
-        dead1.setFitHeight(30);
-        dead1.setFitWidth(30);
-        dead1.setPreserveRatio(true);
-
-        life2.setFitHeight(30);
-        life2.setFitWidth(30);
-        life2.setPreserveRatio(true);
-        dead2.setFitHeight(30);
-        dead2.setFitWidth(30);
-        dead2.setPreserveRatio(true);
-
-        life3.setFitHeight(30);
-        life3.setFitWidth(30);
-        life3.setPreserveRatio(true);
-        dead3.setFitHeight(30);
-        dead3.setFitWidth(30);
-        dead3.setPreserveRatio(true);
-
-        userScoreLabel.setWrapText(true);
-        userScoreLabel.setPrefSize(80, 30);
-        userScoreLabel.setAlignment(Pos.CENTER);
-        userScoreLabel.setTextFill(Color.WHITE);
-
-        uhealth1.setPrefSize(30, 30);
-        uhealth2.setPrefSize(30, 30);
-        uhealth3.setPrefSize(30, 30);
-
-        if(userScore == 0) {
-            uhealth1.setGraphic(dead1);
-            uhealth2.setGraphic(dead2);
-            uhealth3.setGraphic(dead3);
-        }
-        else if(userScore == 1) {
-            uhealth1.setGraphic(life1);
-            uhealth2.setGraphic(dead2);
-            uhealth3.setGraphic(dead3);
-        }
-        else if(userScore == 2) {
-            uhealth1.setGraphic(life1);
-            uhealth2.setGraphic(life2);
-            uhealth3.setGraphic(dead3);
-        }
-        else if(userScore == 3) {
-            uhealth1.setGraphic(life1);
-            uhealth2.setGraphic(life2);
-            uhealth3.setGraphic(life3);
-        }
-        healthBar = new HBox(2, userScoreLabel, uhealth1, uhealth2, uhealth3);
-        return healthBar;
-
-    }
-
-    private HBox getOppHealthBar(){
-        HBox healthBar;
-        ImageView olife1 = new ImageView(lifeImage);
-        ImageView olife2 = new ImageView(lifeImage);
-        ImageView olife3 = new ImageView(lifeImage);
-
-        ImageView odead1 = new ImageView(deadImage);
-        ImageView odead2 = new ImageView(deadImage);
-        ImageView odead3 = new ImageView(deadImage);
-
-        olife1.setFitHeight(30);
-        olife1.setFitWidth(30);
-        olife1.setPreserveRatio(true);
-        odead1.setFitHeight(30);
-        odead1.setFitWidth(30);
-        odead1.setPreserveRatio(true);
-
-        olife2.setFitHeight(30);
-        olife2.setFitWidth(30);
-        olife2.setPreserveRatio(true);
-        odead2.setFitHeight(30);
-        odead2.setFitWidth(30);
-        odead2.setPreserveRatio(true);
-
-        olife3.setFitHeight(30);
-        olife3.setFitWidth(30);
-        olife3.setPreserveRatio(true);
-        odead3.setFitHeight(30);
-        odead3.setFitWidth(30);
-        odead3.setPreserveRatio(true);
-
-
-        oppScoreLabel.setWrapText(true);
-        oppScoreLabel.setPrefSize(80, 30);
-        oppScoreLabel.setAlignment(Pos.CENTER);
-        oppScoreLabel.setTextFill(Color.WHITE);
-
-        ohealth1.setPrefSize(30, 30);
-        ohealth2.setPrefSize(30, 30);
-        ohealth3.setPrefSize(30, 30);
-
-        if(oppScore == 0) {
-            ohealth1.setGraphic(odead1);
-            ohealth2.setGraphic(odead2);
-            ohealth3.setGraphic(odead3);
-        }
-        else if(oppScore == 1) {
-            ohealth1.setGraphic(olife1);
-            ohealth2.setGraphic(odead2);
-            ohealth3.setGraphic(odead3);
-        }
-        else if(oppScore == 2) {
-            ohealth1.setGraphic(olife1);
-            ohealth2.setGraphic(olife2);
-            ohealth3.setGraphic(odead3);
-        }
-        else if(oppScore == 3) {
-            ohealth1.setGraphic(olife1);
-            ohealth2.setGraphic(olife2);
-            ohealth3.setGraphic(olife3);
-        }
-        healthBar = new HBox(2, oppScoreLabel, ohealth1, ohealth2, ohealth3);
-        return healthBar;
-    }
-
-
 
     private Parent createPlayTableContent(){
         BorderPane playTable = new BorderPane();
@@ -319,11 +165,6 @@ public class clientFX extends Application {
         playBox = new HBox(15, play, next);
         playBox.setAlignment(Pos.CENTER);
 
-        userHealthBar = getUserHealthBar();
-        userHealthBar.setAlignment(Pos.CENTER_RIGHT);
-        oppHealthBar = getOppHealthBar();
-        oppHealthBar.setAlignment(Pos.CENTER_LEFT);
-
         Background optBackground = new Background(new BackgroundFill(Color.TRANSPARENT,  CornerRadii.EMPTY, Insets.EMPTY));
         rockButton.setBackground(optBackground);
         paperButton.setBackground(optBackground);
@@ -362,8 +203,6 @@ public class clientFX extends Application {
         VBox gamePaneBottom = new VBox(10, options, playBox);
         gamePaneBottom.setAlignment(Pos.CENTER);
         gamePane.setTop(this.messages);
-        gamePane.setLeft(this.userHealthBar);
-        gamePane.setRight(this.oppHealthBar);
         gamePane.setBottom(gamePaneBottom);
         gamePaneBottom.setPadding(new Insets(10));
         gamePaneBottom.setAlignment(Pos.TOP_CENTER);
@@ -420,21 +259,26 @@ public class clientFX extends Application {
     }
 
     private Parent createWaitingContent(){
-        //need list of all currently connected players
         waitingPane = new BorderPane();
         waitingPane.setBackground(background);
 
-        ObservableList<String> obsList = FXCollections.observableArrayList(clientsConnected);
+        clientsConnected.remove(0); //remove nameslist from array
+        String lastname[] = clientsConnected.get(clientsConnected.size()-1).split("]"); //to remove ] off of last name in array
+        clientsConnected.remove(clientsConnected.size()-1);
+        clientsConnected.add(lastname[0]);
+        combo = new ComboBox<>(FXCollections.observableList(clientsConnected));
 
-        ComboBox<String> combo = new ComboBox<>(obsList);
 
-        System.out.println("In createWaitingContent:");
-        for (int i =0; i < obsList.size(); i++){
-            System.out.println(obsList.get(i));
-        }
-        VBox vbox = new VBox();
-        vbox.getChildren().setAll(combo);
-        waitingPane.setCenter(vbox);
+        waitingBtn.setOnAction(chooseOpponent);
+
+        HBox hbox = new HBox();
+        hbox.getChildren().setAll(combo, waitingBtn);
+        hbox.setAlignment(Pos.CENTER);
+        waitingPane.setCenter(hbox);
+
+
+
+        //OPPONENT:
 
         return waitingPane;
     }
@@ -457,7 +301,6 @@ public class clientFX extends Application {
     public void start(Stage primaryStage){
         // TODO Auto-generated method stub
         startScene = new Scene(createStartContent(), 400, 400);
-        waitingScene = new Scene(createWaitingContent(), 400, 400);
         gameScene = new Scene(createGameContent(), 700, 500);
         primaryStage.setScene(startScene);
 
@@ -541,14 +384,6 @@ public class clientFX extends Application {
         playAgain.setOnAction(event-> {
             try {
                 conn.send("playing again");
-                oppScore = 0;
-                userScore = 0;
-                oppHealthBar = getOppHealthBar();
-                userHealthBar = getUserHealthBar();
-                userHealthBar.setAlignment(Pos.CENTER);
-                oppHealthBar.setAlignment(Pos.CENTER);
-                gamePane.setLeft(this.userHealthBar);
-                gamePane.setRight(this.oppHealthBar);
                 startMessages.setText("CONNECTED TO SERVER");
                 messages.setText(".....");
                 primaryStage.setScene(startScene);
@@ -610,7 +445,11 @@ public class clientFX extends Application {
                data.toString();
                if (data.toString().split(",")[0].equals("[NAMESLIST")){ //received list of connected clients
                    String[] clients = data.toString().split(","); //populate clientsConnected list
-                   for (int i = 0; i < clients.length; i++){ clientsConnected.add(clients[i]); }
+                   for (int i = 0; i < clients.length; i++){ clientsConnected.add(clients[i]);  }
+                   waitingScene = new Scene(createWaitingContent(), 400, 400);
+                   if(primaryStage.getScene() != gameScene) {
+                       primaryStage.setScene(waitingScene);
+                   }
                }
 
                switch (data.toString()) {
@@ -620,7 +459,7 @@ public class clientFX extends Application {
                        isConnected = true;
                        try{ conn.send("NAME: " + username); }
                        catch(Exception e){ System.out.println("Error in clientFX"); }
-                       primaryStage.setScene(waitingScene);
+                       System.out.println("creating waiting scene");
                        break;
                    case "NO CONNECTION":
                        isConnected = false;
@@ -640,19 +479,9 @@ public class clientFX extends Application {
                        startMessages.setPrefSize(300, 40);
                        primaryStage.setScene(startScene);
                        break;
-                   case "closing":
-                       break;
                    case "start":
                        messages.setText(".....");
                        enableOptions();
-                       userScore = 0;
-                       oppScore = 0;
-                       userHealthBar = getUserHealthBar();
-                       oppHealthBar = getOppHealthBar();
-                       userHealthBar.setAlignment(Pos.CENTER);
-                       oppHealthBar.setAlignment(Pos.CENTER);
-                       gamePane.setLeft(this.userHealthBar);
-                       gamePane.setRight(this.oppHealthBar);
                        oppChoice = "blank";
                        userChoice = "blank";
                        oppChoiceDisplay.setGraphic(getChoicePlayed(oppChoice));
@@ -687,25 +516,11 @@ public class clientFX extends Application {
                    case "winner":
                        messages.setText(userChoice + " wins :-)");
                        gamePane.setTop(messages);
-                       userScore++;
-                       userHealthBar = getUserHealthBar();
-                       oppHealthBar = getOppHealthBar();
-                       userHealthBar.setAlignment(Pos.CENTER);
-                       oppHealthBar.setAlignment(Pos.CENTER);
-                       gamePane.setLeft(this.userHealthBar);
-                       gamePane.setRight(this.oppHealthBar);
                        next.setDisable(false);
                        break;
                    case "loser":
                        messages.setText(userChoice + " loses :-(");
                        gamePane.setTop(messages);
-                       oppScore++;
-                       oppHealthBar = getOppHealthBar();
-                       userHealthBar = getUserHealthBar();
-                       userHealthBar.setAlignment(Pos.CENTER);
-                       oppHealthBar.setAlignment(Pos.CENTER);
-                       gamePane.setLeft(this.userHealthBar);
-                       gamePane.setRight(this.oppHealthBar);
                        next.setDisable(false);
                        break;
                    case "WIN":
@@ -736,12 +551,19 @@ public class clientFX extends Application {
                        primaryStage.setScene(startScene);
                        messages.setText("PLAYER DISCONNECTED :-(");
                        gamePane.setTop(messages);
-                       userScore = 0;
-                       oppScore = 0;
                        break;
                }
 
            });
         });
     }
+
+    EventHandler<ActionEvent> chooseOpponent = new EventHandler<ActionEvent>(){
+
+        public void handle(ActionEvent event) {
+            String choice = combo.getValue();
+            System.out.println("Player chose opponent: " + choice);
+
+        }
+    };
 }

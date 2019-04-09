@@ -28,7 +28,6 @@ public abstract class NetworkConnection {
     }
 
     public void closeConn() throws Exception{
-        callback.accept("closing");
         isConnected = false;
         this.socketClient.close();
 
