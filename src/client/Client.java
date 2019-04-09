@@ -10,9 +10,6 @@ public class Client extends NetworkConnection {
     private int port;
     private String name;
 
-    public String getName() {
-        return name;
-    }
 
     public Client(String ip, int port, String name, Consumer<Serializable> callback) {
         super(callback);
@@ -31,6 +28,10 @@ public class Client extends NetworkConnection {
     public int getPort() {
         // TODO Auto-generated method stub
         return this.port;
+    }
+
+    public String getName() {
+        return this.name;
     }
 
 }
