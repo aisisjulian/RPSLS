@@ -31,8 +31,6 @@ import javafx.scene.control.ComboBox;
 import javax.swing.JComboBox;
 import javafx.scene.Group;
 
-
-//warisa's comment
 public class clientFX extends Application {
 
     private Scene startScene;
@@ -56,7 +54,6 @@ public class clientFX extends Application {
     private Image lizardImage = new Image("lizard.png");
     private Image spockImage = new Image("spock.png");
     private Image blankImage = new Image("blank.png");
-
 
     private ImageView rockIV = new ImageView(rockImage);
     private ImageView paperIV = new ImageView(paperImage);
@@ -196,7 +193,6 @@ public class clientFX extends Application {
         lizardButton.setPrefSize(70, 70);
         spockButton.setPrefSize(70, 70);
 
-
         HBox options = new HBox(5, rockButton, paperButton, scissorsButton, lizardButton, spockButton);
         options.setAlignment(Pos.CENTER);
 
@@ -209,7 +205,6 @@ public class clientFX extends Application {
         gamePane.setCenter(createPlayTableContent());
 
         return gamePane;
-
     }
 
     private Parent createStartContent() {
@@ -262,12 +257,7 @@ public class clientFX extends Application {
         waitingPane = new BorderPane();
         waitingPane.setBackground(background);
 
-        clientsConnected.remove(0); //remove nameslist from array
-        String lastname[] = clientsConnected.get(clientsConnected.size()-1).split("]"); //to remove ] off of last name in array
-        clientsConnected.remove(clientsConnected.size()-1);
-        clientsConnected.add(lastname[0]);
         combo = new ComboBox<>(FXCollections.observableList(clientsConnected));
-
 
         waitingBtn.setOnAction(chooseOpponent);
 
@@ -275,8 +265,6 @@ public class clientFX extends Application {
         hbox.getChildren().setAll(combo, waitingBtn);
         hbox.setAlignment(Pos.CENTER);
         waitingPane.setCenter(hbox);
-
-
 
         //OPPONENT:
 
@@ -424,11 +412,8 @@ public class clientFX extends Application {
                     nameInput.clear();
                 }
             }
-
         });
-
         primaryStage.show();
-
     }
 
     @Override
@@ -443,9 +428,29 @@ public class clientFX extends Application {
         return new Client(IP, portIn, username, data -> {
            Platform.runLater(()->{
                data.toString();
-               if (data.toString().split(",")[0].equals("[NAMESLIST")){ //received list of connected clients
-                   String[] clients = data.toString().split(","); //populate clientsConnected list
-                   for (int i = 0; i < clients.length; i++){ clientsConnected.add(clients[i]);  }
+               if (data.toString().split(", ")[0].equals("[NAMESLIST")){ //received list of connected clients
+                   System.out.println(data.toString());
+                   String[] clients = data.toString().split(", "); //populate clientsConnected list
+                   for (int i = 1; i < clients.length; i++){
+                           clientsConnected.add(clients[i]);
+                   }
+                   String lastname[] = clientsConnected.get(clientsConnected.size()-1).split("]"); //to remove ] off of last name in array
+                   clientsConnected.remove(clientsConnected.size()-1);
+                   clientsConnected.add(lastname[0]);
+                   waitingScene = new Scene(createWaitingContent(), 400, 400);
+                   if(primaryStage.getScene() != gameScene) {
+                       primaryStage.setScene(waitingScene);
+                   }
+               }
+               if(data.toString().split(" ")[0].equals("name")){
+                   clientsConnected.add(data.toString().split(" ")[1]);
+                   waitingScene = new Scene(createWaitingContent(), 400, 400);
+                   if(primaryStage.getScene() != gameScene) {
+                       primaryStage.setScene(waitingScene);
+                   }
+               }
+               if(data.toString().split(" ")[0].equals("remove")){
+                   clientsConnected.remove(data.toString().split(" ")[1]);
                    waitingScene = new Scene(createWaitingContent(), 400, 400);
                    if(primaryStage.getScene() != gameScene) {
                        primaryStage.setScene(waitingScene);
@@ -553,7 +558,6 @@ public class clientFX extends Application {
                        gamePane.setTop(messages);
                        break;
                }
-
            });
         });
     }

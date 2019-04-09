@@ -4,13 +4,15 @@ import java.io.Serializable;
 import java.util.function.Consumer;
 
 /*hello this is ari!!!*/
-//hi
-//hello
 public class Client extends NetworkConnection {
 
     private String ip;
     private int port;
     private String name;
+
+    public String getName() {
+        return name;
+    }
 
     public Client(String ip, int port, String name, Consumer<Serializable> callback) {
         super(callback);
@@ -30,7 +32,5 @@ public class Client extends NetworkConnection {
         // TODO Auto-generated method stub
         return this.port;
     }
-
-
 
 }
