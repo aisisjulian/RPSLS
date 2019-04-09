@@ -69,7 +69,8 @@ public class clientFX extends Application {
 
     private Button playAgain = new Button("Play Again"); //change to continue from again
     private Button quit = new Button("Quit");
-    private Button next = new Button("Continue");
+    private Button next = new Button("Return");
+    private Button playNext = new Button("Play Next Person");
 
     private Button play = new Button("Play");
     private Label userChoiceDisplay = new Label();
@@ -130,8 +131,13 @@ public class clientFX extends Application {
         quit.setDisable(true);
         quit.setTextFill(Color.WHITE);
         quit.setBackground(buttonBackground);
+        playNext.setDisable(true);
+        playNext.setPrefSize(100, 25);
+        playNext.setBackground(buttonBackground);
+        playNext.setTextFill(Color.WHITE);
 
-        HBox gameOptions = new HBox(10, playAgain, quit);
+
+        HBox gameOptions = new HBox(10, playAgain, playNext, quit);
         gameOptions.setAlignment(Pos.CENTER);
         gameOptions.setPadding(new Insets(10));
         VBox centerBox = new VBox(10, this.oppChoiceDisplay, gameOptions, this.userChoiceDisplay);
@@ -359,6 +365,12 @@ public class clientFX extends Application {
             primaryStage.setScene(waitingScene);
             next.setDisable(true);
         });
+
+        playNext.setOnAction(event -> {
+            try{ conn.send("PLAY-NEXT"); }
+            catch(Exception e){}
+        });
+
         quit.setOnAction(event->{
             try {
                 conn.send("quit");
@@ -377,6 +389,7 @@ public class clientFX extends Application {
             playAgain.setDisable(true);
             quit.setDisable(true);
         });
+
         playAgain.setOnAction(event-> {
             try {
                 conn.send("playing again");
@@ -389,7 +402,6 @@ public class clientFX extends Application {
             }
             playAgain.setDisable(true);
             quit.setDisable(true);
-
         });
 
         connect.setOnAction(event->{
@@ -583,8 +595,7 @@ public class clientFX extends Application {
             System.out.println("Player chose opponent: " + choice);
             try {
                 conn.send("OPPONENT: " + choice);
-            }catch (Exception e){ System.out.println("Caught in chooseOpponent function");  }
-
+            }catch (Exception e){ System.out.println("Caught in choose Opponent function");  }
         }
     };
 }

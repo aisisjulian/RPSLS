@@ -10,7 +10,6 @@ public class Client extends NetworkConnection {
     private int port;
     private String name;
 
-
     public Client(String ip, int port, String name, Consumer<Serializable> callback) {
         super(callback);
         this.ip = ip;

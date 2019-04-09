@@ -34,7 +34,6 @@ public abstract class NetworkConnection {
     abstract protected String getIP();
     abstract protected int getPort();
 
-
     public void clientConnect(){
          try (Socket s = new Socket(getIP(), getPort());
               ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
