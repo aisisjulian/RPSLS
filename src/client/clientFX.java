@@ -90,6 +90,10 @@ public class clientFX extends Application {
     private String username;
     private Button waitingBackBtn = new Button("Back to Start");
 
+    private Runnable task;
+    private Thread t;
+    boolean started = false;
+
 
     public ImageView getChoicePlayed(String s){
         ImageView c;
@@ -276,8 +280,6 @@ public class clientFX extends Application {
         hbox.setAlignment(Pos.CENTER);
         waitingPane.setCenter(hbox);
 
-        //OPPONENT:
-
         return waitingPane;
     }
     public void disableOptions(){
@@ -407,14 +409,21 @@ public class clientFX extends Application {
         connect.setOnAction(event->{
             if(!ipInput.getText().isEmpty() && !portInput.getText().isEmpty()){
                 try {
-                    conn = createClient(ipInput.getText(), Integer.parseInt(portInput.getText()), nameInput.getText(), primaryStage);
-                    username = nameInput.getText();
-                    primaryStage.setTitle(username);
-                    Runnable task = () -> conn.clientConnect();
-                    Thread t = new Thread(task);
-                    t.setDaemon(true);
-                    t.start();
-                    ipInput.clear();
+                    if(!started) {
+                        started = true;
+                        conn = createClient(ipInput.getText(), Integer.parseInt(portInput.getText()), nameInput.getText(), primaryStage);
+                        username = nameInput.getText();
+                       // primaryStage.setTitle(username);
+                        task = () -> conn.clientConnect(username);
+                        t = new Thread(task);
+                        t.setDaemon(true);
+                        t.start();
+                    }
+                    else{
+                        username = nameInput.getText();
+                        try{ conn.send("NAME: " + username); } catch(Exception e){}
+                    }
+                   /* ipInput.clear();
                     ipInput.setVisible(false);
                     ip.setVisible(false);
                     port.setVisible(false);
@@ -425,7 +434,7 @@ public class clientFX extends Application {
                     nameInput.setVisible(false);
                     connect.setDisable(true);
                     connect.setText("waiting for opponent");
-                    connect.setPrefSize(300, 40);
+                    connect.setPrefSize(300, 40);*/
                 }
                 catch(Exception e){
                     connect.setDisable(false);
@@ -450,6 +459,10 @@ public class clientFX extends Application {
         return new Client(IP, portIn, username, data -> {
            Platform.runLater(()->{
                data.toString();
+               if (data.toString().split(", ")[0].equals("TAKEN")){
+                   nameInput.clear();
+
+               }
                if (data.toString().split(", ")[0].equals("[NAMESLIST")){ //received list of connected clients
                    System.out.println(data.toString());
                    String[] clients = data.toString().split(", "); //populate clientsConnected list
@@ -481,11 +494,24 @@ public class clientFX extends Application {
 
                switch (data.toString()) {
                    case "CONNECTED":
+                       primaryStage.setTitle(username);
                        startMessages.setText("CONNECTED TO SERVER");
                        startMessages.setPrefSize(300, 40);
                        isConnected = true;
-                       try{ conn.send("NAME: " + username); }
-                       catch(Exception e){ System.out.println("Error in clientFX"); }
+                     //  try{ conn.send("NAME: " + username); }
+                     //  catch(Exception e){ System.out.println("Error in clientFX"); }
+                       ipInput.clear();
+                       ipInput.setVisible(false);
+                       ip.setVisible(false);
+                       port.setVisible(false);
+                       portInput.clear();
+                       portInput.setVisible(false);
+                       name.setVisible(false);
+                       nameInput.clear();
+                       nameInput.setVisible(false);
+                       connect.setDisable(true);
+                       connect.setText("waiting for opponent");
+                       connect.setPrefSize(300, 40);
                        System.out.println("creating waiting scene");
                        break;
                    case "NO CONNECTION":

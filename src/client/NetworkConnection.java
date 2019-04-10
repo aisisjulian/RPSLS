@@ -34,7 +34,7 @@ public abstract class NetworkConnection {
     abstract protected String getIP();
     abstract protected int getPort();
 
-    public void clientConnect(){
+    public void clientConnect(String username){
          try (Socket s = new Socket(getIP(), getPort());
               ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
               ObjectInputStream in = new ObjectInputStream(s.getInputStream())){
@@ -45,7 +45,8 @@ public abstract class NetworkConnection {
             this.out = out;
             this.in = in;
 
-             send("CONNECTED");
+           //  send("CONNECTED");
+             try{ send("NAME: " + username); } catch(Exception e){ System.out.println("didn't send name");}
              while (isConnected) {
                  Serializable data = (Serializable) in.readObject();
 
@@ -59,7 +60,6 @@ public abstract class NetworkConnection {
                      send(data);
                  }
                  callback.accept(data);
-
 
                  System.out.println("Client Recieved: " + data);
              }
