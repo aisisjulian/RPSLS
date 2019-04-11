@@ -313,7 +313,19 @@ public class clientFX extends Application {
         primaryStage.setScene(startScene);
 
         waitingBackBtn.setOnAction(actionEvent -> {
+            startScene = new Scene(createStartContent(), 400, 400);
+            gameScene = new Scene(createGameContent(), 700, 500);
             primaryStage.setScene(startScene);
+            ip.setVisible(true);
+            ipInput.setVisible(true);
+            port.setVisible(true);
+            portInput.setVisible(true);
+            connect.setText("connect");
+            connect.setPrefSize(100, 40);
+            connect.setDisable(false);
+            nameInput.clear();
+            nameInput.setVisible(true);
+
         });
 
         rockButton.setOnAction(event->{
