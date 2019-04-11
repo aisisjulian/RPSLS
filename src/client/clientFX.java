@@ -595,11 +595,17 @@ public class clientFX extends Application {
                        messages.setText(userChoice + " wins :-)");
                        gamePane.setTop(messages);
                        next.setDisable(false);
+                       playAgain.setDisable(false);
+                       playNext.setDisable(false);
+                       quit.setDisable(false);
                        break;
                    case "loser":
                        messages.setText(userChoice + " loses :-(");
                        gamePane.setTop(messages);
                        next.setDisable(false);
+                       playAgain.setDisable(false);
+                       playNext.setDisable(false);
+                       quit.setDisable(false);
                        break;
                    case "WIN":
                        playAgain.setDisable(false);
@@ -628,6 +634,9 @@ public class clientFX extends Application {
                    case "tie":
                        messages.setText("Tie!");
                        gamePane.setTop(messages);
+                       playAgain.setDisable(false);
+                       playNext.setDisable(false);
+                       quit.setDisable(false);
                        break;
                    case "playerDisconnected":
                        primaryStage.setScene(startScene);
