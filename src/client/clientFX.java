@@ -93,6 +93,8 @@ public class clientFX extends Application {
     private Runnable task;
     private Thread t;
     boolean started = false;
+    private Label versusLabel = new Label();
+    private String requested;
 
 
     public ImageView getChoicePlayed(String s){
@@ -212,7 +214,13 @@ public class clientFX extends Application {
 
         VBox gamePaneBottom = new VBox(10, options, playBox);
         gamePaneBottom.setAlignment(Pos.CENTER);
-        gamePane.setTop(this.messages);
+        versusLabel.setText("Fill");
+        versusLabel.setAlignment(Pos.CENTER);
+        versusLabel.setTextFill(Color.WHITE);
+        versusLabel.setTextAlignment(TextAlignment.CENTER);
+        VBox messageinfo = new VBox(messages, versusLabel);
+        messageinfo.setAlignment(Pos.CENTER);
+        gamePane.setTop(messageinfo);
         gamePane.setBottom(gamePaneBottom);
         gamePaneBottom.setPadding(new Insets(10));
         gamePaneBottom.setAlignment(Pos.TOP_CENTER);
@@ -421,6 +429,7 @@ public class clientFX extends Application {
                     }
                     else{
                         username = nameInput.getText();
+
                         try{ conn.send("NAME: " + username); } catch(Exception e){}
                     }
                    /* ipInput.clear();
@@ -491,6 +500,10 @@ public class clientFX extends Application {
                        primaryStage.setScene(waitingScene);
                    }
                }
+               if (data.toString().split( " ")[0].equals("PLAY-REQUEST:") ){
+                   requested = data.toString().split(" ")[1];
+
+               }
 
                switch (data.toString()) {
                    case "CONNECTED":
@@ -539,6 +552,7 @@ public class clientFX extends Application {
                        userChoice = "blank";
                        oppChoiceDisplay.setGraphic(getChoicePlayed(oppChoice));
                        userChoiceDisplay.setGraphic(getChoicePlayed(userChoice));
+                       versusLabel.setText(requested + " played");
                        primaryStage.setScene(gameScene);
                        break;
                    case "rock":
