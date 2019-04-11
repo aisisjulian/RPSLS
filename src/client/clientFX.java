@@ -472,6 +472,7 @@ public class clientFX extends Application {
     public void stop() throws Exception{
         if(isConnected) {
             conn.send("disconnected");
+            isConnected = false;
             conn.closeConn();
         }
     }
@@ -554,6 +555,7 @@ public class clientFX extends Application {
                        connect.setPrefSize(100, 40);
                        startMessages.setText("NO CONNECTION");
                        startMessages.setPrefSize(300, 40);
+                       started = false;
                        primaryStage.setScene(startScene);
                        break;
                    case "start":
