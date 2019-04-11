@@ -642,11 +642,18 @@ public class clientFX extends Application {
     EventHandler<ActionEvent> chooseOpponent = new EventHandler<ActionEvent>(){
 
         public void handle(ActionEvent event) {
+
             choice = combo.getValue();
-            System.out.println("Player chose opponent: " + choice);
-            try {
-                conn.send("OPPONENT: " + choice);
-            }catch (Exception e){ System.out.println("Caught in choose Opponent function");  }
+
+            if (choice != null){
+                System.out.println("Player chose opponent: " + choice);
+                try {
+                    conn.send("OPPONENT: " + choice);
+                }catch (Exception e){ System.out.println("Caught in choose Opponent function");  }
+            }
+
         }
+
+
     };
 }
