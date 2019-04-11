@@ -427,12 +427,12 @@ public class clientFX extends Application {
         });
 
         connect.setOnAction(event->{
-            if(!ipInput.getText().isEmpty() && !portInput.getText().isEmpty()){
+            if(!ipInput.getText().isEmpty() && !portInput.getText().isEmpty()  && !nameInput.getText().isEmpty()){
                 try {
                     if(!started) {
                         started = true;
                         conn = createClient(ipInput.getText(), Integer.parseInt(portInput.getText()), nameInput.getText(), primaryStage);
-                        username = nameInput.getText();
+                        this.username = nameInput.getText();
                        // primaryStage.setTitle(username);
                         task = () -> conn.clientConnect(username);
                         t = new Thread(task);
@@ -440,8 +440,7 @@ public class clientFX extends Application {
                         t.start();
                     }
                     else{
-                        username = nameInput.getText();
-
+                        this.username = nameInput.getText();
                         try{ conn.send("NAME: " + username); } catch(Exception e){}
                     }
                    /* ipInput.clear();
@@ -462,6 +461,7 @@ public class clientFX extends Application {
                     ipInput.clear();
                     portInput.clear();
                     nameInput.clear();
+                    System.out.println("exception with connect button");
                 }
             }
         });
@@ -482,7 +482,6 @@ public class clientFX extends Application {
                data.toString();
                if (data.toString().split(", ")[0].equals("TAKEN")){
                    nameInput.clear();
-
                }
                if (data.toString().split(", ")[0].equals("[NAMESLIST")){ //received list of connected clients
                    System.out.println(data.toString());
@@ -519,7 +518,7 @@ public class clientFX extends Application {
 
                switch (data.toString()) {
                    case "CONNECTED":
-                       primaryStage.setTitle(username);
+                       primaryStage.setTitle(this.username);
                        startMessages.setText("CONNECTED TO SERVER");
                        startMessages.setPrefSize(300, 40);
                        isConnected = true;
