@@ -69,8 +69,8 @@ public class clientFX extends Application {
 
     private Button playAgain = new Button("Play Again"); //change to continue from again
     private Button quit = new Button("Quit");
-    private Button next = new Button("Return");
-    private Button playNext = new Button("Play Next Person");
+    private Button returnButton = new Button("Return");
+    private Button playNext = new Button("Play Next Opponent");
 
     private Button play = new Button("Play");
     private Label userChoiceDisplay = new Label();
@@ -79,22 +79,22 @@ public class clientFX extends Application {
     private String oppChoice = "blank";
 
     private BorderPane gamePane, startPane, waitingPane;
-    private HBox playBox;
+    private VBox playBox;
 
-    private boolean madeChoice = false;
     private boolean isConnected = false;
-    private ArrayList<String> clientsConnected = new ArrayList<String>();
+    private ArrayList<String> clientsConnected = new ArrayList<>();
     private ComboBox<String> combo;
-    private Button waitingBtn = new Button("Choose Player");
+    private Button waitingBtn = new Button("Choose Opponent");
     private String choice;
     private String username;
-    private Button waitingBackBtn = new Button("Back to Start");
 
     private Runnable task;
     private Thread t;
     boolean started = false;
     private Label versusLabel = new Label();
     private String requested;
+    private boolean playersWaiting = false;
+    private boolean opponentConnected = false;
 
 
     public ImageView getChoicePlayed(String s){
@@ -133,22 +133,23 @@ public class clientFX extends Application {
         playAgain.setPrefSize(100, 25);
         playAgain.setBackground(buttonBackground);
         playAgain.setTextFill(Color.WHITE);
+        playAgain.setAlignment(Pos.CENTER);
         quit.setPrefSize(80, 25);
         quit.setDisable(true);
         quit.setTextFill(Color.WHITE);
         quit.setBackground(buttonBackground);
+        quit.setAlignment(Pos.CENTER);
         playNext.setDisable(true);
-        playNext.setPrefSize(100, 25);
+        playNext.setPrefSize(150, 25);
         playNext.setBackground(buttonBackground);
         playNext.setTextFill(Color.WHITE);
+        playNext.setAlignment(Pos.CENTER);
 
-
-        HBox gameOptions = new HBox(10, playAgain, playNext, quit);
+        HBox gameOptions = new HBox(15, playAgain, playNext, quit);
         gameOptions.setAlignment(Pos.CENTER);
-        gameOptions.setPadding(new Insets(10));
-        VBox centerBox = new VBox(10, this.oppChoiceDisplay, gameOptions, this.userChoiceDisplay);
+        //gameOptions.setPadding(new Insets(10));
+        VBox centerBox = new VBox(5, this.oppChoiceDisplay, gameOptions, this.userChoiceDisplay);
         centerBox.setAlignment(Pos.CENTER);
-
         playTable.setCenter(centerBox);
         return playTable;
     }
@@ -163,20 +164,20 @@ public class clientFX extends Application {
         messages.setPadding(new Insets(20));
         messages.setTextFill(Color.WHITE);
 
-        play.setPrefSize(80, 45);
+        play.setPrefSize(80, 40);
         play.setDisable(true);
         play.setAlignment(Pos.CENTER);
         play.setTextFill(Color.WHITE);
         play.setBackground(buttonBackground);
 
-        next.setPrefSize(80, 45);
-        next.setDisable(true);
-        next.setAlignment(Pos.CENTER);
-        next.setTextFill(Color.WHITE);
-        next.setBackground(buttonBackground);
+        returnButton.setPrefSize(80, 40);
+        returnButton.setAlignment(Pos.CENTER);
+        returnButton.setTextFill(Color.WHITE);
+        returnButton.setBackground(buttonBackground);
+        returnButton.setVisible(false);
 
-        playBox = new HBox(15, play, next);
-        playBox.setAlignment(Pos.CENTER);
+        playBox = new VBox(5, play, returnButton);
+        playBox.setAlignment(Pos.TOP_CENTER);
 
         Background optBackground = new Background(new BackgroundFill(Color.TRANSPARENT,  CornerRadii.EMPTY, Insets.EMPTY));
         rockButton.setBackground(optBackground);
@@ -212,17 +213,17 @@ public class clientFX extends Application {
         HBox options = new HBox(5, rockButton, paperButton, scissorsButton, lizardButton, spockButton);
         options.setAlignment(Pos.CENTER);
 
-        VBox gamePaneBottom = new VBox(10, options, playBox);
+        VBox gamePaneBottom = new VBox(3, options, this.playBox);
         gamePaneBottom.setAlignment(Pos.CENTER);
-        versusLabel.setText("Fill");
+        versusLabel.setText("...");
         versusLabel.setAlignment(Pos.CENTER);
         versusLabel.setTextFill(Color.WHITE);
         versusLabel.setTextAlignment(TextAlignment.CENTER);
-        VBox messageinfo = new VBox(messages, versusLabel);
-        messageinfo.setAlignment(Pos.CENTER);
-        gamePane.setTop(messageinfo);
+        VBox messageInfo = new VBox(messages, versusLabel);
+        messageInfo.setAlignment(Pos.CENTER);
+        gamePane.setTop(messageInfo);
         gamePane.setBottom(gamePaneBottom);
-        gamePaneBottom.setPadding(new Insets(10));
+      //  gamePaneBottom.setPadding(new Insets(10));
         gamePaneBottom.setAlignment(Pos.TOP_CENTER);
         gamePane.setCenter(createPlayTableContent());
 
@@ -280,11 +281,14 @@ public class clientFX extends Application {
         waitingPane.setBackground(background);
 
         combo = new ComboBox<>(FXCollections.observableList(clientsConnected));
-
+        combo.setPrefSize(150, 40);
+        combo.setBackground(new Background(new BackgroundFill(Color.HONEYDEW, CornerRadii.EMPTY, Insets.EMPTY)));
+        waitingBtn.setPrefSize(150, 40);
+        waitingBtn.setBackground(new Background(new BackgroundFill(Color.HONEYDEW, CornerRadii.EMPTY, Insets.EMPTY)));
         waitingBtn.setOnAction(chooseOpponent);
 
-        HBox hbox = new HBox();
-        hbox.getChildren().setAll(combo, waitingBtn, waitingBackBtn);
+        HBox hbox = new HBox(10);
+        hbox.getChildren().setAll(combo, waitingBtn);
         hbox.setAlignment(Pos.CENTER);
         waitingPane.setCenter(hbox);
 
@@ -309,23 +313,15 @@ public class clientFX extends Application {
     public void start(Stage primaryStage){
         // TODO Auto-generated method stub
         startScene = new Scene(createStartContent(), 400, 400);
-        gameScene = new Scene(createGameContent(), 700, 500);
+        gameScene = new Scene(createGameContent(), 600, 500);
         primaryStage.setScene(startScene);
 
-        waitingBackBtn.setOnAction(actionEvent -> {
-            startScene = new Scene(createStartContent(), 400, 400);
-            gameScene = new Scene(createGameContent(), 700, 500);
-            primaryStage.setScene(startScene);
-            ip.setVisible(true);
-            ipInput.setVisible(true);
-            port.setVisible(true);
-            portInput.setVisible(true);
-            connect.setText("connect");
-            connect.setPrefSize(100, 40);
-            connect.setDisable(false);
-            nameInput.clear();
-            nameInput.setVisible(true);
-
+        returnButton.setOnAction(actionEvent-> {
+            primaryStage.setScene(waitingScene);
+            if(clientsConnected.size() == 0){
+                waitingBtn.setDisable(true);
+            }
+            combo.setDisable(false);
         });
 
         rockButton.setOnAction(event->{
@@ -368,6 +364,7 @@ public class clientFX extends Application {
         play.setOnAction(event->{
             disableOptions();
             play.setDisable(true);
+            play.setPrefHeight(0);
             try{
                 messages.setText("waiting for opponent's move...");
                 conn.send(userChoice);
@@ -377,19 +374,13 @@ public class clientFX extends Application {
             }
         });
 
-        next.setOnAction(event-> {
-            enableOptions();
-            oppChoice = "blank";
-            oppChoiceDisplay.setGraphic(getChoicePlayed(oppChoice));
-            userChoice = "blank";
-            userChoiceDisplay.setGraphic(getChoicePlayed(userChoice));
-            messages.setText("......");
-            primaryStage.setScene(waitingScene);
-            next.setDisable(true);
-        });
-
         playNext.setOnAction(event -> {
-            try{ conn.send("PLAY-NEXT"); }
+            try{ conn.send("PLAY-NEXT");
+                 playAgain.setDisable(true);
+                 quit.setDisable(true);
+                 playNext.setDisable(true);
+                 versusLabel.setText("OPPONENT: " + choice);
+            }
             catch(Exception e){}
         });
 
@@ -414,7 +405,8 @@ public class clientFX extends Application {
 
         playAgain.setOnAction(event-> {
             try {
-                conn.send("playing again");
+                conn.send("OPPONENT: " + choice);
+                versusLabel.setText("OPPONENT: " + choice);
                 startMessages.setText("CONNECTED TO SERVER");
                 messages.setText(".....");
                 primaryStage.setScene(startScene);
@@ -424,6 +416,7 @@ public class clientFX extends Application {
             }
             playAgain.setDisable(true);
             quit.setDisable(true);
+            playNext.setDisable(true);
         });
 
         connect.setOnAction(event->{
@@ -433,7 +426,6 @@ public class clientFX extends Application {
                         started = true;
                         conn = createClient(ipInput.getText(), Integer.parseInt(portInput.getText()), nameInput.getText(), primaryStage);
                         this.username = nameInput.getText();
-                       // primaryStage.setTitle(username);
                         task = () -> conn.clientConnect(username);
                         t = new Thread(task);
                         t.setDaemon(true);
@@ -443,18 +435,6 @@ public class clientFX extends Application {
                         this.username = nameInput.getText();
                         try{ conn.send("NAME: " + username); } catch(Exception e){}
                     }
-                   /* ipInput.clear();
-                    ipInput.setVisible(false);
-                    ip.setVisible(false);
-                    port.setVisible(false);
-                    portInput.clear();
-                    portInput.setVisible(false);
-                    name.setVisible(false);
-                    nameInput.clear();
-                    nameInput.setVisible(false);
-                    connect.setDisable(true);
-                    connect.setText("waiting for opponent");
-                    connect.setPrefSize(300, 40);*/
                 }
                 catch(Exception e){
                     connect.setDisable(false);
@@ -471,7 +451,7 @@ public class clientFX extends Application {
     @Override
     public void stop() throws Exception{
         if(isConnected) {
-            conn.send("disconnected");
+            conn.send("DISCONNECTED");
             isConnected = false;
             conn.closeConn();
         }
@@ -480,7 +460,6 @@ public class clientFX extends Application {
     private Client createClient(String IP, int portIn, String username, Stage primaryStage) {
         return new Client(IP, portIn, username, data -> {
            Platform.runLater(()->{
-               data.toString();
                if (data.toString().split(", ")[0].equals("TAKEN")){
                    nameInput.clear();
                }
@@ -496,6 +475,12 @@ public class clientFX extends Application {
                    waitingScene = new Scene(createWaitingContent(), 400, 400);
                    if(primaryStage.getScene() != gameScene) {
                        primaryStage.setScene(waitingScene);
+                       if(clientsConnected.size() == 0){
+                           waitingBtn.setDisable(true);
+                       }
+                       else{
+                           waitingBtn.setDisable(false);
+                       }
                    }
                }
                if(data.toString().split(" ")[0].equals("name")){
@@ -503,6 +488,9 @@ public class clientFX extends Application {
                    waitingScene = new Scene(createWaitingContent(), 400, 400);
                    if(primaryStage.getScene() != gameScene) {
                        primaryStage.setScene(waitingScene);
+                       if(clientsConnected.size() == 0){
+                           waitingBtn.setDisable(true);
+                       }
                    }
                }
                if(data.toString().split(" ")[0].equals("remove")){
@@ -510,11 +498,13 @@ public class clientFX extends Application {
                    waitingScene = new Scene(createWaitingContent(), 400, 400);
                    if(primaryStage.getScene() != gameScene) {
                        primaryStage.setScene(waitingScene);
+                       if(clientsConnected.size() == 0){
+                           waitingBtn.setDisable(true);
+                       }
                    }
                }
                if (data.toString().split( " ")[0].equals("PLAY-REQUEST:") ){
                    requested = data.toString().split(" ")[1];
-
                }
 
                switch (data.toString()) {
@@ -523,8 +513,6 @@ public class clientFX extends Application {
                        startMessages.setText("CONNECTED TO SERVER");
                        startMessages.setPrefSize(300, 40);
                        isConnected = true;
-                     //  try{ conn.send("NAME: " + username); }
-                     //  catch(Exception e){ System.out.println("Error in clientFX"); }
                        ipInput.clear();
                        ipInput.setVisible(false);
                        ip.setVisible(false);
@@ -535,9 +523,8 @@ public class clientFX extends Application {
                        nameInput.clear();
                        nameInput.setVisible(false);
                        connect.setDisable(true);
-                       connect.setText("waiting for opponent");
+                       connect.setText("waiting for players to join...");
                        connect.setPrefSize(300, 40);
-                       System.out.println("creating waiting scene");
                        break;
                    case "NO CONNECTION":
                        isConnected = false;
@@ -565,83 +552,76 @@ public class clientFX extends Application {
                        userChoice = "blank";
                        oppChoiceDisplay.setGraphic(getChoicePlayed(oppChoice));
                        userChoiceDisplay.setGraphic(getChoicePlayed(userChoice));
-                       versusLabel.setText(requested + " played");
+                       play.setPrefHeight(40);
+                       play.setVisible(true);
+                       returnButton.setVisible(false);
                        primaryStage.setScene(gameScene);
+                       opponentConnected = true;
                        break;
                    case "rock":
                        oppChoice = "rock";
                        oppChoiceDisplay.setGraphic(getChoicePlayed(oppChoice));
-                       next.setDisable(false);
                        break;
                    case "paper":
                        oppChoice = "paper";
                        oppChoiceDisplay.setGraphic(getChoicePlayed(oppChoice));
-                       next.setDisable(false);
                        break;
                    case "scissors":
                        oppChoice = "scissors";
                        oppChoiceDisplay.setGraphic(getChoicePlayed(oppChoice));
-                       next.setDisable(false);
                        break;
                    case "lizard":
                        oppChoice = "lizard";
                        oppChoiceDisplay.setGraphic(getChoicePlayed(oppChoice));
-                       next.setDisable(false);
                        break;
                    case "spock":
                        oppChoice = "spock";
                        oppChoiceDisplay.setGraphic(getChoicePlayed(oppChoice));
-                       next.setDisable(false);
                        break;
-                   case "winner":
-                       messages.setText(userChoice + " wins :-)");
-                       gamePane.setTop(messages);
-                       next.setDisable(false);
-                       playAgain.setDisable(false);
-                       playNext.setDisable(false);
-                       quit.setDisable(false);
+                   case "PLAYER-WAITING":
+                       playersWaiting = true;
                        break;
-                   case "loser":
-                       messages.setText(userChoice + " loses :-(");
-                       gamePane.setTop(messages);
-                       next.setDisable(false);
-                       playAgain.setDisable(false);
-                       playNext.setDisable(false);
-                       quit.setDisable(false);
+                   case "NO-PLAYERS-WAITING":
+                       playersWaiting = false;
+                       playNext.setDisable(true);
                        break;
+                   case "OPPONENT-QUIT":
+                       opponentConnected = false;
+                       playAgain.setDisable(true);
                    case "WIN":
+                       if(playersWaiting){playNext.setDisable(false);}
+                       if(opponentConnected){playAgain.setDisable(false);}
                        playAgain.setDisable(false);
                        quit.setDisable(false);
                        disableOptions();
                        messages.setText("CONGRATS YOU WIN :-)");
                        gamePane.setTop(messages);
-                       next.setDisable(true);
-                       oppChoice = "blank";
-                       userChoice = "blank";
-                       oppChoiceDisplay.setGraphic(getChoicePlayed(oppChoice));
-                       userChoiceDisplay.setGraphic(getChoicePlayed(userChoice));
+                       play.setVisible(false);
+                       returnButton.setVisible(true);
                        break;
                    case "LOSE":
-                       playAgain.setDisable(false);
+                       if(playersWaiting){playNext.setDisable(false);}
+                       if(opponentConnected){playAgain.setDisable(false);}
                        quit.setDisable(false);
                        disableOptions();
-                       next.setDisable(true);
                        messages.setText("SORRY YOU LOSE :-(");
                        gamePane.setTop(messages);
-                       oppChoice = "blank";
-                       userChoice = "blank";
-                       oppChoiceDisplay.setGraphic(getChoicePlayed(oppChoice));
-                       userChoiceDisplay.setGraphic(getChoicePlayed(userChoice));
+                       play.setVisible(false);
+                       returnButton.setVisible(true);
                        break;
-                   case "tie":
-                       messages.setText("Tie!");
+                   case "TIE":
+                       messages.setText("TIE!");
+                       disableOptions();
                        gamePane.setTop(messages);
-                       playAgain.setDisable(false);
-                       playNext.setDisable(false);
+                       if(opponentConnected){playAgain.setDisable(false);}
+                       if(playersWaiting){playNext.setDisable(false);}
                        quit.setDisable(false);
+                       play.setVisible(false);
+                       returnButton.setVisible(true);
                        break;
-                   case "playerDisconnected":
-                       primaryStage.setScene(startScene);
+                   case "OPPONENT-DISCONNECTED":
+                       primaryStage.setScene(waitingScene);
+                       combo.setDisable(false);
                        messages.setText("PLAYER DISCONNECTED :-(");
                        gamePane.setTop(messages);
                        break;
@@ -653,7 +633,6 @@ public class clientFX extends Application {
     EventHandler<ActionEvent> chooseOpponent = new EventHandler<ActionEvent>(){
 
         public void handle(ActionEvent event) {
-
             choice = combo.getValue();
 
             if (choice != null){
@@ -661,6 +640,9 @@ public class clientFX extends Application {
                 try {
                     conn.send("OPPONENT: " + choice);
                 }catch (Exception e){ System.out.println("Caught in choose Opponent function");  }
+                versusLabel.setText("OPPONENT: " + choice);
+                combo.setDisable(true);
+                combo.setValue("");
             }
 
         }
