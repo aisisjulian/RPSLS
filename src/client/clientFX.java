@@ -147,7 +147,7 @@ public class clientFX extends Application {
 
         HBox gameOptions = new HBox(15, playAgain, playNext, quit);
         gameOptions.setAlignment(Pos.CENTER);
-        //gameOptions.setPadding(new Insets(10));
+        gameOptions.setPadding(new Insets(5));
         VBox centerBox = new VBox(5, this.oppChoiceDisplay, gameOptions, this.userChoiceDisplay);
         centerBox.setAlignment(Pos.CENTER);
         playTable.setCenter(centerBox);
@@ -219,11 +219,15 @@ public class clientFX extends Application {
         versusLabel.setAlignment(Pos.CENTER);
         versusLabel.setTextFill(Color.WHITE);
         versusLabel.setTextAlignment(TextAlignment.CENTER);
+        versusLabel.setPrefHeight(40);
+        versusLabel.setPrefWidth(600);
+        versusLabel.setBackground(new Background(new BackgroundFill(Color.DARKCYAN, CornerRadii.EMPTY, Insets.EMPTY)));
         VBox messageInfo = new VBox(messages, versusLabel);
         messageInfo.setAlignment(Pos.CENTER);
+        messageInfo.setPadding(new Insets(10));
         gamePane.setTop(messageInfo);
         gamePane.setBottom(gamePaneBottom);
-      //  gamePaneBottom.setPadding(new Insets(10));
+        gamePaneBottom.setPadding(new Insets(10));
         gamePaneBottom.setAlignment(Pos.TOP_CENTER);
         gamePane.setCenter(createPlayTableContent());
 
@@ -322,6 +326,16 @@ public class clientFX extends Application {
                 waitingBtn.setDisable(true);
             }
             combo.setDisable(false);
+            playAgain.setDisable(true);
+            quit.setDisable(true);
+            playNext.setDisable(true);
+            try{
+                conn.send("quit");
+            }
+            catch(Exception e){
+                System.out.println("unable to connect");
+            }
+
         });
 
         rockButton.setOnAction(event->{
@@ -379,7 +393,7 @@ public class clientFX extends Application {
                  playAgain.setDisable(true);
                  quit.setDisable(true);
                  playNext.setDisable(true);
-                 versusLabel.setText("OPPONENT: " + choice);
+                versusLabel.setText("   " + choice + "   VS   " + username + "   ");
             }
             catch(Exception e){}
         });
@@ -395,18 +409,22 @@ public class clientFX extends Application {
                 connect.setText("connect");
                 connect.setPrefSize(100, 40);
                 connect.setDisable(false);
+                clientsConnected.clear();
+                primaryStage.setTitle("");
                 stop();
             } catch(Exception e){
                 System.out.println("NO CONNECTION");
             }
             playAgain.setDisable(true);
             quit.setDisable(true);
+            playNext.setDisable(true);
+            playersWaiting = false;
         });
 
         playAgain.setOnAction(event-> {
             try {
                 conn.send("OPPONENT: " + choice);
-                versusLabel.setText("OPPONENT: " + choice);
+                versusLabel.setText("   " + choice + "   VS   " + username + "   ");
                 startMessages.setText("CONNECTED TO SERVER");
                 messages.setText(".....");
                 primaryStage.setScene(startScene);
@@ -475,36 +493,35 @@ public class clientFX extends Application {
                    waitingScene = new Scene(createWaitingContent(), 400, 400);
                    if(primaryStage.getScene() != gameScene) {
                        primaryStage.setScene(waitingScene);
-                       if(clientsConnected.size() == 0){
-                           waitingBtn.setDisable(true);
-                       }
-                       else{
-                           waitingBtn.setDisable(false);
-                       }
+                       if(clientsConnected.size() == 0){ waitingBtn.setDisable(true); }
+                       else{ waitingBtn.setDisable(false); }
                    }
                }
                if(data.toString().split(" ")[0].equals("name")){
                    clientsConnected.add(data.toString().split(" ")[1]);
                    waitingScene = new Scene(createWaitingContent(), 400, 400);
-                   if(primaryStage.getScene() != gameScene) {
-                       primaryStage.setScene(waitingScene);
-                       if(clientsConnected.size() == 0){
-                           waitingBtn.setDisable(true);
-                       }
-                   }
+                   if(primaryStage.getScene() != gameScene) { primaryStage.setScene(waitingScene); }
+                   if(clientsConnected.size() == 0){ waitingBtn.setDisable(true); }
+                   else{ waitingBtn.setDisable(false); }
                }
                if(data.toString().split(" ")[0].equals("remove")){
                    clientsConnected.remove(data.toString().split(" ")[1]);
                    waitingScene = new Scene(createWaitingContent(), 400, 400);
-                   if(primaryStage.getScene() != gameScene) {
-                       primaryStage.setScene(waitingScene);
-                       if(clientsConnected.size() == 0){
-                           waitingBtn.setDisable(true);
-                       }
-                   }
+                   if(primaryStage.getScene() != gameScene) { primaryStage.setScene(waitingScene); }
+                   if(clientsConnected.size() == 0){ waitingBtn.setDisable(true); }
+                   else{ waitingBtn.setDisable(false); }
                }
                if (data.toString().split( " ")[0].equals("PLAY-REQUEST:") ){
                    requested = data.toString().split(" ")[1];
+               }
+               if(data.toString().split(" ")[0].equals("DISCONNECTED")){
+                   String playerName = data.toString().split(" ")[1];
+                    if(choice.equals(playerName)){
+                        playAgain.setDisable(true);
+                        primaryStage.setScene(waitingScene);
+                        combo.setDisable(false);
+                        opponentConnected = false;
+                    }
                }
 
                switch (data.toString()) {
@@ -620,6 +637,7 @@ public class clientFX extends Application {
                        returnButton.setVisible(true);
                        break;
                    case "OPPONENT-DISCONNECTED":
+                       playAgain.setDisable(true);
                        primaryStage.setScene(waitingScene);
                        combo.setDisable(false);
                        messages.setText("PLAYER DISCONNECTED :-(");
@@ -640,7 +658,7 @@ public class clientFX extends Application {
                 try {
                     conn.send("OPPONENT: " + choice);
                 }catch (Exception e){ System.out.println("Caught in choose Opponent function");  }
-                versusLabel.setText("OPPONENT: " + choice);
+                versusLabel.setText("   " + choice + "   VS   " + username + "   ");
                 combo.setDisable(true);
                 combo.setValue("");
             }

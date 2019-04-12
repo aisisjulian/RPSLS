@@ -59,6 +59,9 @@ public abstract class NetworkConnection {
                  if(data.toString().split(" ")[0].equals("ACCEPTED")){
                      send(data);
                  }
+                 if(data.toString().split(" ")[0].equals("DISCONNECTED")){
+                     send(data);
+                 }
                  callback.accept(data);
 
                  System.out.println("Client Recieved: " + data);
